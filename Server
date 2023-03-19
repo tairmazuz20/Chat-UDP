@@ -1,0 +1,34 @@
+import socket
+
+# Define server address and port
+UDP_IP = '0.0.0.0'
+UDP_PORT = 9999
+
+# Create a UDP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
+
+# Bind the socket to the server address and port
+sock.bind((UDP_IP, UDP_PORT))
+
+# Create an empty dictionary to store client addresses
+dictClient = {}
+
+while True:
+
+    # Receive a message and client address from a client
+    data, addr = sock.recvfrom(1024)
+
+    print('received message:', data.decode())
+    print(dictClient)
+    # If this is a new client, add their address to the dictionary
+    for addr1 in dictClient.values():
+        if addr1 == addr:
+            recipient, message_text = data.decode().split(' ')
+            if recipient not in dictClient:
+                print("There is no such user")
+                break
+            addrRecipient = dictClient[recipient]
+            sock.sendto(message_text.encode(), addrRecipient)
+            break
+    else:
+        dictClient[data.decode()] = addr
